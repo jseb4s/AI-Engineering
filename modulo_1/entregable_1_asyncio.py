@@ -13,7 +13,7 @@ def log(mensaje: str) -> None:
     print(f"[{time.perf_counter() - INICIO:5.2f}s] {mensaje}")
 
 
-# --- Paso 2: simulación de llamadas -----------------------------------------
+# Paso 2: simulación de llamadas
 
 async def _llamada_simulada(nombre: str, latencia: float) -> str:
     log(f"{nombre}: inicia (latencia simulada {latencia}s)")
@@ -35,7 +35,7 @@ async def local_llama_call() -> str:
     return await _llamada_simulada("llama-local", 3.0)
 
 
-# --- Pasos 3 y 4: orquestación con gather + timeout -------------------------
+# Pasos 3 y 4: orquestación con gather + timeout
 
 async def orquestar() -> dict[str, str | None]:
     """Dispara los tres modelos a la vez con un límite de tiempo total.
@@ -47,7 +47,7 @@ async def orquestar() -> dict[str, str | None]:
         "claude-3": claude_3_call,
         "llama-local": local_llama_call,
     }
-    # Se crean como tareas para poder consultar después cuáles terminaron.
+    # Se crean como tareas para poder consultar después cuáles terminaron
     tareas = {
         nombre: asyncio.create_task(llamada(), name=nombre)
         for nombre, llamada in llamadas.items()
@@ -61,7 +61,7 @@ async def orquestar() -> dict[str, str | None]:
             "se cancelan las llamadas pendientes")
 
     # Las tareas que terminaron conservan su resultado; las demás quedaron
-    # canceladas por el timeout.
+    # canceladas por el timeout
     resultados: dict[str, str | None] = {}
     for nombre, tarea in tareas.items():
         if tarea.cancelled():
@@ -72,7 +72,7 @@ async def orquestar() -> dict[str, str | None]:
     return resultados
 
 
-# --- Paso 5: control de flujo con semáforo ----------------------------------
+# Paso 5: control de flujo con semáforo
 
 async def _llamada_limitada(indice: int, semaforo: asyncio.Semaphore) -> str:
     nombre = f"llamada-{indice:02d}"
@@ -89,7 +89,7 @@ async def control_de_flujo() -> list[str]:
     )
 
 
-# --- Programa principal -----------------------------------------------------
+# Programa principal
 
 async def main() -> None:
     log("== Fase 1: tres modelos en paralelo, timeout total de "
